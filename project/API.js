@@ -1,4 +1,4 @@
-const data = require('./data_computer.json')
+const data = require('../data_computer.json')
 const express = require('express')
 
 const app = express()
@@ -9,13 +9,20 @@ app.get('/',(req, res)=>{
     
     //ver se tem conteudo no name
     if(req.query.name){
-        const name = Object.keys(data)
-
+        //console.log(data[req.query.name])
+        const resul = []
         const filter_name = req.query.name
-        const resul = name.filter(item => item === filter_name)
+
+        //pegando pelo nome escolhido
+        for(const item of data){
+            const name = Object.keys(item)
+            if(item[name][1][0] === filter_name){
+                resul.push(item)
+            }
+        }
         
     
-        res.json(data[resul])
+        res.json(resul)
     }
 
     res.json(data)

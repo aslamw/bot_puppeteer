@@ -2,6 +2,8 @@ const pup = require('puppeteer');
 
 const url = "https://webscraper.io/test-sites/e-commerce/allinone/computers/laptops";
 const data = {};
+const value_product = [];
+const data_product = [];
 
 (async () => {
 
@@ -28,15 +30,28 @@ const data = {};
         const description = await page.$eval('.description', element => element.innerText);
         const description_product = description.split(',')
 
+        //faz uma segunda filtragem
         if(description_product[0].includes('Lenovo')){
             const value = await page.$eval('.caption h4 ', element => element.innerText);
 
             const description_product = description.split(',')
 
-            data[description_product[0]] = [value, description_product]
-        }
-        
+            const clear_value = parseFloat(value.replace('$',''))
 
+            value_product.push(clear_value)
+            data[clear_value] = description_product
+        }
+    }
+
+    const Value = value_product.sort((a, b) => a - b)
+
+    //coloca os dados em ordem
+    for(let i = 0; i < Value.length; i++){
+
+        let name = data[Value[i]][0]
+        let money = `$${String(Value[i])}`
+
+        data_product.push({[name] : [money,data[Value[i]]]})
     }
 
     await browser.close();
@@ -44,7 +59,7 @@ const data = {};
     //coloca os dados em um json
     const fs = require("fs")
 
-    fs.writeFile("data_computer.json", JSON.stringify(data), err => {
+    fs.writeFile("data_computer.json", JSON.stringify(data_product), err => {
      
     // Verificando erros
     if (err) throw err; 
